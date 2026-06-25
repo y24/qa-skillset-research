@@ -1,0 +1,7 @@
+{
+  "name": "qa-defect-regression-review-mvp",
+  "description": "A minimal QA skillset that turns historical defects into regression viewpoints and applies them to test design review.",
+  "author": {
+    "name": "qa-skillset-research"
+  }
+}
