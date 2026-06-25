@@ -1,0 +1,33 @@
+version: 0.1
+generated_from:
+  sources: []
+
+patterns:
+  - id: PAT-001
+    name: ""
+    display_name: ""
+    summary: ""
+    status: candidate
+    risk_level: medium
+    confidence: hypothesis
+    affected_quality_characteristics: []
+    defect_ids: []
+    affected_areas: []
+    common_conditions: []
+    likely_root_causes:
+      - id: RC-001
+        description: ""
+        evidence_type: inferred
+        verification_needed: true
+    recommended_regression_viewpoints:
+      - id: RV-001
+        title: ""
+        priority: medium
+        rationale: ""
+    evidence:
+      - source_id: ""
+        source_type: defect_ticket
+        type: direct
+        observation: ""
+        reasoning: ""
+        needs_verification: false
