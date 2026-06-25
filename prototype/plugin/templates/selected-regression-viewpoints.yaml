@@ -1,0 +1,21 @@
+version: 0.1
+selection_context:
+  source_catalog: ""
+  target_release: ""
+  changed_areas: []
+  time_budget: ""
+  existing_tests_available: false
+
+selected:
+  - viewpoint_id: RV-001
+    title: ""
+    priority: high
+    source_patterns: []
+    source_defects: []
+    applicable_areas: []
+    cadence:
+      - release_gate
+    selection_reason: []
+    coverage: unknown
+
+not_selected: []

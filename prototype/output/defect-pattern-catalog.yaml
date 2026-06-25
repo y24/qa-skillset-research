@@ -1,0 +1,275 @@
+version: 0.1
+generated_from:
+  sources:
+    - path: samples/defects.sample.csv
+      type: defect_csv
+      included_records: 12
+      excluded_records: 0
+
+patterns:
+  - id: PAT-001
+    name: period_boundary_financial_aggregation
+    display_name: Period boundary financial aggregation
+    summary: Financial aggregation or comparison results are wrong around fiscal period boundaries.
+    status: active
+    risk_level: high
+    confidence: supported
+    affected_quality_characteristics:
+      - functional_correctness
+      - data_integrity
+      - auditability
+    defect_ids:
+      - BUG-001
+      - BUG-002
+    affected_areas:
+      - 連結帳票
+      - 比較帳票
+    common_conditions:
+      - fiscal_year_start
+      - fiscal_year_end
+      - previous_current_period_comparison
+      - closing_date_inclusion
+      - opening_balance
+    likely_root_causes:
+      - id: RC-001
+        description: 期間境界の期待仕様とテスト条件が不足していた。
+        evidence_type: inferred
+        verification_needed: true
+    recommended_regression_viewpoints:
+      - id: RV-001
+        title: 期首・期末境界での集計と比較
+        priority: high
+        rationale: BUG-001 and BUG-002 show high-severity failures at fiscal period boundaries.
+    evidence:
+      - source_id: BUG-001
+        source_type: defect_ticket
+        type: direct
+        observation: 期末日当日の売上明細が連結帳票の合計に含まれない。
+        reasoning: This directly demonstrates a fiscal period-end aggregation failure.
+        needs_verification: false
+      - source_id: BUG-002
+        source_type: defect_ticket
+        type: direct
+        observation: 前期比較帳票で期首残高と当期初日の仕訳が重複表示される。
+        reasoning: This directly demonstrates a fiscal period-start comparison failure.
+        needs_verification: false
+
+  - id: PAT-002
+    name: rerun_retry_idempotency_failure
+    display_name: Rerun and retry idempotency failure
+    summary: Rerun, retry, or partial failure recovery leaves stale values, duplicates rows, or skips valid rows.
+    status: active
+    risk_level: high
+    confidence: supported
+    affected_quality_characteristics:
+      - reliability
+      - data_integrity
+      - functional_correctness
+    defect_ids:
+      - BUG-003
+      - BUG-008
+      - BUG-012
+    affected_areas:
+      - 再集計
+      - CSV取込
+    common_conditions:
+      - rerun
+      - retry_after_failure
+      - partial_failure
+      - retrospective_adjustment
+      - stale_cache
+      - large_import
+    likely_root_causes:
+      - id: RC-002
+        description: 再実行時の状態初期化・一意性・行単位ステータスの設計が弱い。
+        evidence_type: inferred
+        verification_needed: true
+    recommended_regression_viewpoints:
+      - id: RV-002
+        title: 再実行・リトライ・部分失敗復旧の冪等性
+        priority: high
+        rationale: Three defects share rerun or retry failure conditions, including one production defect.
+    evidence:
+      - source_id: BUG-003
+        source_type: defect_ticket
+        type: direct
+        observation: 遡及修正後に再集計しても一部明細が旧金額のまま残る。
+        reasoning: Rerun does not fully refresh affected values.
+        needs_verification: false
+      - source_id: BUG-008
+        source_type: defect_ticket
+        type: direct
+        observation: 1万行超CSV取込でリトライ後に一部行が重複登録される。
+        reasoning: Retry lacks idempotency or duplicate protection.
+        needs_verification: false
+      - source_id: BUG-012
+        source_type: defect_ticket
+        type: direct
+        observation: 失敗後の再取込で正常行も取込済み扱いになる。
+        reasoning: Partial failure state is not tracked correctly per row.
+        needs_verification: false
+
+  - id: PAT-003
+    name: authorization_state_transition_mismatch
+    display_name: Authorization and state transition mismatch
+    summary: Permission checks fail when workflow state, role changes, or active sessions interact.
+    status: active
+    risk_level: critical
+    confidence: supported
+    affected_quality_characteristics:
+      - security
+      - auditability
+      - functional_correctness
+    defect_ids:
+      - BUG-004
+      - BUG-010
+    affected_areas:
+      - 仕訳承認
+      - 権限管理
+    common_conditions:
+      - approved_state
+      - role_change
+      - stale_permission_cache
+      - session_continuation
+    likely_root_causes:
+      - id: RC-003
+        description: 状態遷移表と権限マトリクスを組み合わせたテストが不足していた。
+        evidence_type: inferred
+        verification_needed: true
+    recommended_regression_viewpoints:
+      - id: RV-003
+        title: 状態×権限×セッション更新のアクセス制御
+        priority: critical
+        rationale: BUG-004 is Critical and BUG-010 shows stale permissions after role change.
+    evidence:
+      - source_id: BUG-004
+        source_type: defect_ticket
+        type: direct
+        observation: 承認済み仕訳が一般ユーザーでも編集可能。
+        reasoning: Approved-state authorization is not enforced.
+        needs_verification: false
+      - source_id: BUG-010
+        source_type: defect_ticket
+        type: direct
+        observation: ロール変更直後も旧権限で承認可能。
+        reasoning: Permission cache or session invalidation affects access control.
+        needs_verification: false
+
+  - id: PAT-004
+    name: output_reconciliation_rounding_inconsistency
+    display_name: Output reconciliation and rounding inconsistency
+    summary: Screen, report, Excel, currency conversion, or company-specific settings produce inconsistent values.
+    status: active
+    risk_level: medium
+    confidence: supported
+    affected_quality_characteristics:
+      - functional_correctness
+      - data_integrity
+    defect_ids:
+      - BUG-006
+      - BUG-011
+    affected_areas:
+      - Excel出力
+      - 外貨換算
+    common_conditions:
+      - decimal_rounding
+      - currency_conversion
+      - company_setting
+      - export_reconciliation
+    likely_root_causes:
+      - id: RC-004
+        description: 画面・出力・換算処理で共通の計算オラクルを使うテストが不足していた。
+        evidence_type: inferred
+        verification_needed: true
+    recommended_regression_viewpoints:
+      - id: RV-004
+        title: 画面・帳票・Excel・会社別設定の金額一致
+        priority: medium
+        rationale: BUG-006 and BUG-011 show inconsistent rounding and setting application.
+    evidence:
+      - source_id: BUG-006
+        source_type: defect_ticket
+        type: direct
+        observation: 画面上の税額とExcel出力後の税額が1円ずれる。
+        reasoning: Output channel reconciliation failed for tax amount rounding.
+        needs_verification: false
+      - source_id: BUG-011
+        source_type: defect_ticket
+        type: direct
+        observation: 会社別丸め方式が外貨換算処理で反映されない。
+        reasoning: Company-specific setting is not consistently applied to calculation.
+        needs_verification: false
+
+  - id: PAT-005
+    name: audit_trail_gap_workflow_events
+    display_name: Audit trail gap in workflow events
+    summary: Workflow transitions succeed but required audit events are missing.
+    status: active
+    risk_level: high
+    confidence: supported
+    affected_quality_characteristics:
+      - auditability
+      - operability
+    defect_ids:
+      - BUG-005
+    affected_areas:
+      - 監査ログ
+    common_conditions:
+      - denied_to_resubmitted
+      - audit_event
+      - workflow_transition
+    likely_root_causes:
+      - id: RC-005
+        description: 通常の画面動作確認では監査ログの期待結果が確認されていなかった。
+        evidence_type: inferred
+        verification_needed: true
+    recommended_regression_viewpoints:
+      - id: RV-005
+        title: ワークフローイベントごとの監査証跡
+        priority: high
+        rationale: Audit log defects can escape functional UI checks and matter for accounting workflows.
+    evidence:
+      - source_id: BUG-005
+        source_type: defect_ticket
+        type: direct
+        observation: 否認後に再申請した仕訳の監査ログが欠落する。
+        reasoning: A required audit trail is missing for a workflow transition.
+        needs_verification: false
+
+  - id: PAT-006
+    name: concurrent_month_end_processing_data_inconsistency
+    display_name: Concurrent month-end processing data inconsistency
+    summary: Concurrent updates during month-end processing break reconciliation between balances and details.
+    status: monitor
+    risk_level: critical
+    confidence: supported
+    affected_quality_characteristics:
+      - data_integrity
+      - reliability
+      - functional_correctness
+    defect_ids:
+      - BUG-009
+    affected_areas:
+      - 月末締め
+    common_conditions:
+      - month_end
+      - concurrent_update
+      - locking
+      - balance_reconciliation
+    likely_root_causes:
+      - id: RC-006
+        description: 締め処理中の排他制御と並行更新テストが不足していた。
+        evidence_type: inferred
+        verification_needed: true
+    recommended_regression_viewpoints:
+      - id: RV-006
+        title: 月末締め中の並行更新と残高照合
+        priority: critical
+        rationale: BUG-009 is Critical and directly affects financial data integrity.
+    evidence:
+      - source_id: BUG-009
+        source_type: defect_ticket
+        type: direct
+        observation: 締め処理中の別ユーザー更新で残高テーブルと明細が不一致。
+        reasoning: Concurrent update can break financial reconciliation.
+        needs_verification: false

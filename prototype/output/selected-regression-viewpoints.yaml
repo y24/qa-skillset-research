@@ -1,0 +1,145 @@
+version: 0.1
+selection_context:
+  source_catalog: prototype/output/defect-pattern-catalog.yaml
+  target_release: baseline_poc
+  changed_areas: []
+  time_budget: unspecified
+  existing_tests_available: false
+  selection_mode: baseline_release_regression
+
+selected:
+  - viewpoint_id: RV-003
+    title: 状態×権限×セッション更新のアクセス制御
+    priority: critical
+    source_patterns:
+      - PAT-003
+    source_defects:
+      - BUG-004
+      - BUG-010
+    applicable_areas:
+      - 仕訳承認
+      - 権限管理
+      - ユーザー管理
+      - 承認ワークフロー
+      - API更新処理
+    cadence:
+      - release_gate
+      - smoke_if_changed
+    selection_reason:
+      - critical_security_and_auditability_risk
+      - approved_state_edit_defect
+      - stale_permission_after_role_change
+    coverage: unknown
+
+  - viewpoint_id: RV-006
+    title: 月末締め中の並行更新と残高照合
+    priority: critical
+    source_patterns:
+      - PAT-006
+    source_defects:
+      - BUG-009
+    applicable_areas:
+      - 月末締め
+      - 残高集計
+      - 明細更新
+      - 排他制御
+      - リカバリ処理
+    cadence:
+      - release_gate
+      - monitor
+    selection_reason:
+      - critical_data_integrity_risk
+      - production_detected_pattern
+      - financial_reconciliation_impact
+    coverage: unknown
+
+  - viewpoint_id: RV-002
+    title: 再実行・リトライ・部分失敗復旧の冪等性
+    priority: high
+    source_patterns:
+      - PAT-002
+    source_defects:
+      - BUG-003
+      - BUG-008
+      - BUG-012
+    applicable_areas:
+      - 再集計
+      - CSV取込
+      - バッチ処理
+      - 外部連携取込
+      - リカバリ処理
+    cadence:
+      - release_gate
+      - change_triggered
+      - nightly_or_scheduled
+    selection_reason:
+      - repeated_defect_pattern
+      - production_detected_import_retry_defect
+      - data_integrity_and_recovery_risk
+    coverage: unknown
+
+  - viewpoint_id: RV-001
+    title: 期首・期末境界での集計と比較
+    priority: high
+    source_patterns:
+      - PAT-001
+    source_defects:
+      - BUG-001
+      - BUG-002
+    applicable_areas:
+      - 連結帳票
+      - 比較帳票
+      - 帳票出力
+      - 仕訳生成
+      - Excel出力
+    cadence:
+      - release_gate
+      - change_triggered
+    selection_reason:
+      - repeated_high_severity_period_boundary_defects
+      - financial_correctness_risk
+    coverage: unknown
+
+  - viewpoint_id: RV-005
+    title: ワークフローイベントごとの監査証跡
+    priority: high
+    source_patterns:
+      - PAT-005
+    source_defects:
+      - BUG-005
+    applicable_areas:
+      - 監査ログ
+      - 仕訳承認
+      - ワークフロー
+      - 権限違反操作
+    cadence:
+      - release_gate
+      - exploratory_charter
+      - change_triggered
+    selection_reason:
+      - auditability_risk
+      - audit_log_gap_not_visible_in_normal_ui_testing
+    coverage: unknown
+
+  - viewpoint_id: RV-004
+    title: 画面・帳票・Excel・会社別設定の金額一致
+    priority: medium
+    source_patterns:
+      - PAT-004
+    source_defects:
+      - BUG-006
+      - BUG-011
+    applicable_areas:
+      - Excel出力
+      - 外貨換算
+      - 帳票出力
+      - 画面表示
+      - APIレスポンス
+    cadence:
+      - change_triggered
+    selection_reason:
+      - repeated_output_reconciliation_defects
+      - financial_value_consistency_risk
+    coverage: unknown
+
+not_selected: []
