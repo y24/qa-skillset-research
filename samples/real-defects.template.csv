@@ -1,0 +1,2 @@
+id,title,description,feature,module,component,detected_phase,severity,priority,escaped,found_date,release,environment,root_cause,fix_summary,related_pr,existing_test_case_id,test_gap,customer_impact,business_impact,masked_notes
+BUG-0001,[masked title],[masked description],連結帳票,reporting,aggregation,system_test,High,P1,false,2026-01-15,R1.2,staging,期間境界条件漏れ,end_date条件を修正,PR-0001,TC-0001,期末境界の観点不足,none,financial_report_correctness,"Replace customer/account names before use"
